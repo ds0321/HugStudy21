@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.dto.UserRequest;
+import com.example.demo.dto.UserUpdateRequest;
 import com.example.demo.entity.UserEntity;
 import com.example.demo.repository.UserRepository;
+
 /**
  * ユーザー情報 Service
  */
@@ -53,5 +55,16 @@ public class UserService {
     user.setUpdateDate(now);
     userRepository.save(user);
   }
-  
+  /**
+   * ユーザー情報 更新
+   * @param user ユーザー情報
+   */
+  public void update(UserUpdateRequest userUpdateRequest) {
+    UserEntity user = findById(userUpdateRequest.getId());
+    user.setAddress(userUpdateRequest.getAddress());
+    user.setName(userUpdateRequest.getName());
+    user.setPhone(userUpdateRequest.getPhone());
+    user.setUpdateDate(new Date());
+    userRepository.save(user);
+  }
 }
