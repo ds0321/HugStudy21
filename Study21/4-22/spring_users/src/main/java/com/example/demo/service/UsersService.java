@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.entity.UsersEntity;
 import com.example.demo.form.UsersRequest;
+import com.example.demo.form.UsersUpdateRequest;
 import com.example.demo.repository.UsersRepository;
 
 /**
@@ -53,5 +54,25 @@ public class UsersService {
     users.setCreateDate(now);
     users.setUpdateDate(now);
     usersRepository.save(users);
+  }
+  /**
+   * ユーザー情報 更新
+   * @param user ユーザー情報
+   */
+  public void update(UsersUpdateRequest usersUpdateRequest) {
+    UsersEntity users = findById(usersUpdateRequest.getId());
+    users.setAddress(usersUpdateRequest.getAddress());
+    users.setName(usersUpdateRequest.getName());
+    users.setPhone(usersUpdateRequest.getPhone());
+    users.setUpdateDate(new Date());
+    usersRepository.save(users);
+  }
+  /**
+   * ユーザー情報 物理削除
+   * @param id ユーザーID
+   */
+  public void delete(Integer id) {
+      UsersEntity users = findById(id);
+      usersRepository.delete(users);
   }
 }

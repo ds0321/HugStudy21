@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.demo.entity.UsersEntity;
 import com.example.demo.form.UsersRequest;
+import com.example.demo.form.UsersUpdateRequest;
 import com.example.demo.service.UsersService;
 
 /**
@@ -23,7 +24,6 @@ import com.example.demo.service.UsersService;
  */
 @Controller
 public class UsersController {
-
   /**
    * ユーザー情報 Service
    */
@@ -35,30 +35,15 @@ public class UsersController {
    * @param model Model
    * @return ユーザー情報一覧画面のHTML
    */
-  @RequestMapping("/users/list")
-  public String usersList(Model model) {
-    List<UsersEntity> userslist = usersService.searchAll();
-    model.addAttribute("useslist", userslist);
-    return "users/list";
-  }
-  /**
-   * ユーザー新規登録画面を表示
-   * @param model Model
-   * @return ユーザー情報一覧画面
-   */
- 
+  //前回作成したものを使用
 
-  /**
-   * ユーザー情報詳細画面を表示
-   * @param id 表示するユーザーID
-   * @param model Model
-   * @return ユーザー情報詳細画面
-   */
-  @GetMapping("/users/{id}")
-  public String usersDetail(@PathVariable Integer id, Model model) {
-    return "users/view";
-  }
-  
+@RequestMapping("/users/list")
+public String usersList(Model model) {
+  List<UsersEntity> userslist = usersService.searchAll();
+  model.addAttribute("userslist", userslist);
+  return "users/list";
+}
+
   /**
    * ユーザー新規登録画面を表示
    * @param model Model
@@ -92,18 +77,62 @@ public class UsersController {
     usersService.create(usersRequest);
     return "redirect:/users/list";
   }
+  
+  @GetMapping("/users/{id}")
+  public String usersDetail(@PathVariable Integer id, Model model) {
+    UsersEntity users = usersService.findById(id);
+    model.addAttribute("usersData", users);
+    return "users/view";
+  }
 
   /**
-   * ユーザー情報詳細画面を表示
+   * ユーザー編集画面を表示
+   * @param id 表示するユーザーID
+   * @param model Model
+   * @return ユーザー編集画面
+   */
+  @GetMapping("/users/{id}/edit")
+  public String usersEdit(@PathVariable Integer id, Model model) {
+    UsersEntity users = usersService.findById(id);
+    UsersUpdateRequest usersUpdateRequest = new UsersUpdateRequest();
+    usersUpdateRequest.setId(users.getId());
+    usersUpdateRequest.setName(users.getName());
+    usersUpdateRequest.setPhone(users.getPhone());
+    usersUpdateRequest.setAddress(users.getAddress());
+    model.addAttribute("usersUpdateRequest", usersUpdateRequest);
+    return "users/edit";
+  }
+  /**
+   * ユーザー更新
+   * @param userRequest リクエストデータ
+   * @param model Model
+   * @return ユーザー情報詳細画面
+   */
+  @RequestMapping("/users/update")
+  public String usersUpdate(@Validated @ModelAttribute UsersUpdateRequest usersUpdateRequest, BindingResult result, Model model) {
+    if (result.hasErrors()) {
+      List<String> errorList = new ArrayList<String>();
+      for (ObjectError error : result.getAllErrors()) {
+        errorList.add(error.getDefaultMessage());
+      }
+      model.addAttribute("validationError", errorList);
+      return "users/edit";
+    }
+    // ユーザー情報の更新
+    usersService.update(usersUpdateRequest);
+    return String.format("redirect:/users/%d", usersUpdateRequest.getId());
+  }
+  /**
+   * ユーザー情報削除
    * @param id 表示するユーザーID
    * @param model Model
    * @return ユーザー情報詳細画面
    */
-  @GetMapping("/users/{id}")
-  public String userDetail(@PathVariable Integer id, Model model) {
-    UsersEntity users = usersService.findById(id);
-    model.addAttribute("usersData", users);
-    return "users/view";
+  @GetMapping("/users/{id}/delete")
+  public String usersDelete(@PathVariable Integer id, Model model) {
+      // ユーザー情報の削除
+      usersService.delete(id);
+      return "redirect:/users/list";
   }
   
 }
