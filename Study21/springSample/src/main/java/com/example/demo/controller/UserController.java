@@ -77,6 +77,13 @@ public String userList(Model model) {
     userService.create(userRequest);
     return "redirect:/user/list";
   }
+  
+  @GetMapping("/user/{id}")
+  public String userDetail(@PathVariable Integer id, Model model) {
+    UserEntity user = userService.findById(id);
+    model.addAttribute("userData", user);
+    return "user/view";
+  }
 
   /**
    * ユーザー編集画面を表示
@@ -115,4 +122,17 @@ public String userList(Model model) {
     userService.update(userUpdateRequest);
     return String.format("redirect:/user/%d", userUpdateRequest.getId());
   }
+  /**
+   * ユーザー情報削除
+   * @param id 表示するユーザーID
+   * @param model Model
+   * @return ユーザー情報詳細画面
+   */
+  @GetMapping("/user/{id}/delete")
+  public String userDelete(@PathVariable Integer id, Model model) {
+      // ユーザー情報の削除
+      userService.delete(id);
+      return "redirect:/user/list";
+  }
+  
 }
